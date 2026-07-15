@@ -1,0 +1,150 @@
+# ============================================
+# Python
+# ============================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+*.whl
+pip-log.txt
+pip-delete-this-directory.txt
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+*.log
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# ============================================
+# Node.js
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# Build outputs
+frontend/build/
+frontend/dist/
+out/
+
+# Next.js
+.next/
+
+# ============================================
+# Electron
+# ============================================
+electron/dist/
+electron/release/
+electron/out/
+*.dmg
+*.AppImage
+*.deb
+*.rpm
+*.snap
+*.exe
+*.msi
+
+# ============================================
+# Docker
+# ============================================
+.docker/
+docker-compose.override.yml
+
+# ============================================
+# Environment & Secrets
+# ============================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ============================================
+# IDE & Editor
+# ============================================
+*.code-workspace
+.idea/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+.factorypath
+*.launch
+.metadata/
+.gradle/
+*.sublime-*
+
+# ============================================
+# OS Generated
+# ============================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ============================================
+# Project Specific
+# ============================================
+data/
+logs/
+*.pid
+*.seed
+*.pid.lock
+.cache/
+tmp/
+temp/
+models/*.weights
+models/*.cfg
+*.onnx
+*.pb
+*.pt
+*.pth
+coverage/
+htmlcov/
+reports/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+junit/
+test-results/

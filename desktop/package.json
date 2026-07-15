@@ -1,0 +1,53 @@
+{
+  "name": "jarvis-desktop",
+  "version": "1.0.0",
+  "description": "JARVIS AI Desktop Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "NODE_ENV=development electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "author": "JARVIS",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8",
+    "electron-devtools-installer": "^3.2.0",
+    "@electron-forge/cli": "^7.5.0",
+    "@electron-forge/maker-deb": "^7.5.0",
+    "@electron-forge/maker-squirrel": "^7.5.0",
+    "@electron-forge/maker-zip": "^7.5.0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.3.4"
+  },
+  "build": {
+    "appId": "com.jarvis.desktop",
+    "productName": "JARVIS AI",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "forge.config.js"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "../frontend/public/favicon.svg"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "../frontend/public/favicon.svg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
