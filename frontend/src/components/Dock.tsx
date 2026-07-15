@@ -1,45 +1,68 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
-  Home, MessageSquare, CheckSquare, StickyNote, Calendar,
-  Mail, Settings, Brain, Zap, FolderOpen, Image, Globe, Video,
+  Home, MessageSquare, Mic, Zap, Brain, Calendar, Mail,
+  FolderOpen, Image, Globe, Video, Settings, Cpu,
+  PresentationIcon,
 } from 'lucide-react';
+import { useState } from 'react';
 
-const items = [
-  { icon: Home, to: '/', label: 'Home' },
-  { icon: MessageSquare, to: '/chat', label: 'Chat' },
-  { icon: CheckSquare, to: '/tasks', label: 'Tasks' },
-  { icon: StickyNote, to: '/notes', label: 'Notes' },
-  { icon: Calendar, to: '/calendar', label: 'Calendar' },
-  { icon: Mail, to: '/email', label: 'Email' },
-  { icon: Brain, to: '/memory', label: 'Memory' },
-  { icon: Zap, to: '/automation', label: 'Auto' },
-  { icon: FolderOpen, to: '/files', label: 'Files' },
-  { icon: Image, to: '/images', label: 'Images' },
-  { icon: Globe, to: '/websites', label: 'Websites' },
-  { icon: Video, to: '/video', label: 'Video' },
-  { icon: Settings, to: '/settings', label: 'Settings' },
+interface DockItem {
+  icon: React.ElementType;
+  to: string;
+  label: string;
+  color?: string;
+}
+
+const DOCK_ITEMS: DockItem[] = [
+  { icon: Home, to: '/', label: 'Home', color: '#6366f1' },
+  { icon: MessageSquare, to: '/chat', label: 'Chat', color: '#8b5cf6' },
+  { icon: Mic, to: '/voice', label: 'Voice', color: '#06b6d4' },
+  { icon: Zap, to: '/automation', label: 'Automation', color: '#f59e0b' },
+  { icon: Brain, to: '/memory', label: 'Memory', color: '#10b981' },
+  { icon: Calendar, to: '/calendar', label: 'Calendar', color: '#3b82f6' },
+  { icon: Mail, to: '/email', label: 'Email', color: '#ef4444' },
+  { icon: FolderOpen, to: '/files', label: 'Files', color: '#f97316' },
+  { icon: Image, to: '/images', label: 'Image Studio', color: '#ec4899' },
+  { icon: PresentationIcon, to: '/presentations', label: 'Presentations', color: '#a855f7' },
+  { icon: Globe, to: '/websites', label: 'Web Studio', color: '#14b8a6' },
+  { icon: Video, to: '/video', label: 'Video Studio', color: '#f43f5e' },
+  { icon: Cpu, to: '/ai-models', label: 'AI Models', color: '#22c55e' },
+  { icon: Settings, to: '/settings', label: 'Settings', color: '#64748b' },
 ];
 
 export default function Dock() {
+  const location = useLocation();
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+
   return (
-    <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 px-3 py-2 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-slate-700/50 shadow-2xl">
-      {items.map(({ icon: Icon, to, label }) => (
-        <NavLink
-          key={to}
-          to={to}
-          end={to === '/'}
-          className={({ isActive }) =>
-            `flex flex-col items-center gap-0.5 px-2.5 py-1.5 rounded-xl text-xs transition-colors ${
-              isActive
-                ? 'bg-blue-600/20 text-blue-400'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-            }`
-          }
-        >
-          <Icon className="w-5 h-5" />
-          <span className="text-[10px] hidden md:block">{label}</span>
-        </NavLink>
-      ))}
+    <nav className="dock no-drag" role="navigation" aria-label="Main navigation">
+      {DOCK_ITEMS.map(({ icon: Icon, to, label, color }) => {
+        const isActive = to === '/'
+          ? location.pathname === '/'
+          : location.pathname.startsWith(to);
+
+        return (
+          <NavLink
+            key={to}
+            to={to}
+            end={to === '/'}
+            className={`dock-item ${isActive ? 'active' : ''}`}
+            style={isActive ? { '--dock-accent': color } as React.CSSProperties : {}}
+            onMouseEnter={() => setHoveredItem(to)}
+            onMouseLeave={() => setHoveredItem(null)}
+            title={label}
+          >
+            <Icon
+              size={18}
+              style={{
+                color: isActive ? color : hoveredItem === to ? color : undefined,
+                transition: 'color 0.15s ease',
+              }}
+            />
+            <span className="dock-tooltip">{label}</span>
+          </NavLink>
+        );
+      })}
     </nav>
   );
 }
