@@ -16,9 +16,9 @@ from fastapi.staticfiles import StaticFiles
 from config.logging_config import setup_logging
 from config.settings import settings
 from database.connection import close_db, init_db
-from backend.middleware.cors import setup_cors
-from backend.middleware.rate_limiter import RateLimiterMiddleware
-from backend.services.websocket_manager import ws_manager
+from middleware.cors import setup_cors
+from middleware.rate_limiter import RateLimiterMiddleware
+from services.websocket_manager import ws_manager
 
 logger = logging.getLogger(__name__)
 
