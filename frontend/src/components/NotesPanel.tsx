@@ -12,7 +12,7 @@ export default function NotesPanel() {
 
   const fetchNotes = useCallback(async () => {
     try {
-      const { data } = await api.get('/notes/');
+      const { data } = await api.get('/notes');
       setNotes(data.map((n: Record<string, unknown>) => ({
         id: String(n.id),
         title: n.title as string,
@@ -60,7 +60,7 @@ export default function NotesPanel() {
           <button
             onClick={async () => {
               try {
-                const { data } = await api.post('/notes/', { title: 'New Note', content: '', tags: [] });
+                const { data } = await api.post('/notes', { title: 'New Note', content: '', tags: [] });
                 setNotes((prev) => [{
                   id: String(data.id),
                   title: data.title,

@@ -15,14 +15,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+let authRedirecting = false;
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    const msg = error.response?.data?.detail || error.response?.data?.message || error.message;
     if (error.response?.status === 401) {
+      const hadToken = localStorage.getItem('jarvis_token');
       localStorage.removeItem('jarvis_token');
-      window.location.href = '/';
-    } else if (error.response?.status >= 500) {
+      if (hadToken && !authRedirecting) {
+        authRedirecting = true;
+        toast.error('Session expired. Please log in again.');
+        window.location.href = '/auth';
+      }
+      return Promise.reject(error);
+    }
+    const msg = error.response?.data?.detail || error.response?.data?.message || error.message;
+    if (error.response?.status >= 500) {
       toast.error(`Server error: ${msg}`);
     }
     return Promise.reject(error);

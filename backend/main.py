@@ -60,7 +60,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             logger.info("ChromaDB initialized.")
         except Exception as exc:
             logger.warning("ChromaDB warm-up skipped: %s", exc)
-    import concurrent.futures
     loop = asyncio.get_event_loop()
     await loop.run_in_executor(None, _warm_chroma)
 

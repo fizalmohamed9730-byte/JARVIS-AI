@@ -51,7 +51,7 @@ export default function ChatInterface() {
       </div>
 
       {/* Input */}
-      <div className="border-t border-white/10 bg-slate-950/50 p-4 backdrop-blur-md">
+      <div className="border-t p-4 backdrop-blur-md" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)' }}>
         <div className="mx-auto max-w-3xl">
           <ChatInput onSend={sendMessage} disabled={isStreaming} />
         </div>

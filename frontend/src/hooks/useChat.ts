@@ -10,6 +10,7 @@ export function useChat() {
     if (!initialized.current) {
       initialized.current = true;
       store.loadConversations();
+      ws.connect('1');
     }
   }, []);
 
