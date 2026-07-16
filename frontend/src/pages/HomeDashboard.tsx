@@ -1,10 +1,12 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   MessageSquare, CheckSquare, StickyNote, Calendar, Mail, Brain, Zap,
   FolderOpen, Activity, CloudSun, Newspaper, Bell, Bot, Image, Video,
-  UserCircle, Monitor,
+  UserCircle, Monitor, Loader2,
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { api } from '@/utils/api';
 
 interface FeatureCard {
   icon: React.ElementType;
@@ -40,6 +42,23 @@ const greeting = (() => {
 })();
 
 export default function HomeDashboard() {
+  const [weather, setWeather] = useState<{
+    temperature: number | null;
+    condition: string | null;
+    location: string;
+    humidity: number | null;
+    wind_speed: number | null;
+  } | null>(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/weather').then((res) => {
+      if (res.data && res.data.temperature != null) {
+        setWeather(res.data);
+      }
+    }).catch(() => {}).finally(() => setWeatherLoading(false));
+  }, []);
+
   return (
     <div className="mx-auto max-w-4xl space-y-6 p-6 pt-8">
       {/* Header */}
@@ -53,17 +72,23 @@ export default function HomeDashboard() {
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-              {greeting}, Fizal
+              {greeting}
             </h1>
             <p className="mt-1 text-sm" style={{ color: 'var(--text-muted)' }}>
               {format(today, 'EEEE, d MMMM yyyy')}
             </p>
           </div>
-          <div className="flex items-center gap-2 rounded-xl px-4 py-2" style={{ background: 'var(--glass-bg)', border: '1px solid var(--border)' }}>
-            <CloudSun className="h-5 w-5" style={{ color: '#f59e0b' }} />
-            <span className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>29°C</span>
-            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>Pudukottai, Tamil Nadu</span>
-          </div>
+          {weatherLoading ? (
+            <div className="flex items-center gap-2 rounded-xl px-4 py-2" style={{ background: 'var(--glass-bg)', border: '1px solid var(--border)' }}>
+              <Loader2 className="h-5 w-5 animate-spin" style={{ color: 'var(--text-muted)' }} />
+            </div>
+          ) : weather ? (
+            <div className="flex items-center gap-2 rounded-xl px-4 py-2" style={{ background: 'var(--glass-bg)', border: '1px solid var(--border)' }}>
+              <CloudSun className="h-5 w-5" style={{ color: '#f59e0b' }} />
+              <span className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{Math.round(weather.temperature!)}°C</span>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{weather.condition} &middot; {weather.location}</span>
+            </div>
+          ) : null}
         </div>
       </div>
 

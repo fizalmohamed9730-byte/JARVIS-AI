@@ -105,7 +105,7 @@ class ConversationList(BaseModel):
 # ── Message ──────────────────────────────────────────────────────────────
 
 class MessageCreate(BaseModel):
-    role: MessageRoleEnum = Field(..., description="Role of the message sender")
+    role: MessageRoleEnum = Field(MessageRoleEnum.user, description="Role of the message sender")
     content: str = Field(..., min_length=1, max_length=100000, examples=["Hello JARVIS"])
 
 

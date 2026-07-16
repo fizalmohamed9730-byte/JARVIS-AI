@@ -11,14 +11,15 @@ from typing import AsyncGenerator
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from config.logging_config import setup_logging
 from config.settings import settings
 from database.connection import close_db, init_db
-from middleware.cors import setup_cors
-from middleware.rate_limiter import RateLimiterMiddleware
-from services.websocket_manager import ws_manager
+from backend.middleware.cors import setup_cors
+from backend.middleware.rate_limiter import RateLimiterMiddleware
+from backend.services.websocket_manager import ws_manager
 
 logger = logging.getLogger(__name__)
 
@@ -121,6 +122,20 @@ app = FastAPI(
 setup_cors(app)
 app.add_middleware(RateLimiterMiddleware, requests_per_window=120, window_seconds=60)
 
+# Global exception handler for debugging
+import traceback
+from fastapi.responses import JSONResponse
+from fastapi import Request
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error("Unhandled exception for %s %s: %s\n%s",
+                 request.method, request.url.path, exc, traceback.format_exc())
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {exc}"},
+    )
+
 # Static files
 static_dir = Path(settings.static_dir)
 static_dir.mkdir(parents=True, exist_ok=True)
@@ -144,6 +159,7 @@ from backend.api.files_routes import router as files_router
 from backend.api.image_routes import router as image_router
 from backend.api.website_routes import router as website_router
 from backend.api.video_routes import router as video_router
+from backend.api.weather import router as weather_router
 
 API_PREFIX = "/api/v1"
 
@@ -163,6 +179,18 @@ app.include_router(files_router, prefix=API_PREFIX)
 app.include_router(image_router, prefix=API_PREFIX)
 app.include_router(website_router, prefix=API_PREFIX)
 app.include_router(video_router, prefix=API_PREFIX)
+app.include_router(weather_router, prefix=API_PREFIX)
+
+
+# ── Frontend (SPA) ──────────────────────────────────────────────────────
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend" / "dist"
+
+if FRONTEND_DIR.is_dir():
+    app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="frontend_assets")
+    logger.info("Frontend build found at %s", FRONTEND_DIR)
+else:
+    logger.warning("Frontend build NOT found at %s – SPA will not be served", FRONTEND_DIR)
 
 
 # ── WebSocket ────────────────────────────────────────────────────────────
@@ -209,9 +237,21 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
 
 @app.get("/")
 async def root():
+    if FRONTEND_DIR.is_dir():
+        return FileResponse(str(FRONTEND_DIR / "index.html"))
     return {
         "name": settings.app_name,
         "version": settings.app_version,
         "docs": "/docs",
         "health": "/health",
     }
+
+# SPA catch-all: serve index.html for any non-API, non-static path
+FRONTEND_INDEX = str((FRONTEND_DIR / "index.html").resolve()) if FRONTEND_DIR.is_dir() else ""
+
+@app.get("/{full_path:path}")
+async def spa_catch_all(full_path: str):
+    if FRONTEND_INDEX and not full_path.startswith(("api/", "static/", "docs", "redoc", "openapi.json", "ws/")):
+        return FileResponse(FRONTEND_INDEX)
+    from fastapi.responses import JSONResponse
+    return JSONResponse({"detail": "Not Found"}, status_code=404)

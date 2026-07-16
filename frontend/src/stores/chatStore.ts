@@ -99,23 +99,23 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { activeConversationId, messages } = get();
     let convId = activeConversationId;
 
-    if (!convId) {
-      convId = await get().createConversation();
-    }
-
-    const userMessage: Message = {
-      id: crypto.randomUUID(),
-      conversationId: convId,
-      role: 'user',
-      content,
-      timestamp: new Date().toISOString(),
-    };
-
-    set({ messages: [...messages, userMessage], isStreaming: true, streamingContent: '' });
-
     try {
-      await api.post(`/conversations/${convId}/messages`, { content });
-    } catch (error) {
+      if (!convId) {
+        convId = await get().createConversation();
+      }
+
+      const userMessage: Message = {
+        id: crypto.randomUUID(),
+        conversationId: convId,
+        role: 'user',
+        content,
+        timestamp: new Date().toISOString(),
+      };
+
+      set({ messages: [...messages, userMessage], isStreaming: true, streamingContent: '' });
+
+      await api.post(`/conversations/${convId}/messages`, { role: 'user', content });
+    } catch {
       set({ isStreaming: false });
     }
   },
